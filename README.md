@@ -1,6 +1,6 @@
 # PP_LABS_FLASK
 
-#git clone https://github.com/DanyloMelnyk/TimeToGo.git
+#git clone https://github.com/Khrystynapopiv/PP_LABS_FLASK.git
 
 # Install the Python of the selected version(3.6.1)
 
