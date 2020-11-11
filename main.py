@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/api/v1/hello-world-22')
 def hello():
-    return 'Hello World 22'
+    return 'Hello World22'
 
 
 server = make_server('', 8000, app)
