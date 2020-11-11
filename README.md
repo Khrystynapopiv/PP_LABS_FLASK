@@ -1,8 +1,8 @@
 # PP_LABS_FLASK
 
-#git clone https://github.com/Khrystynapopiv/PP_LABS_FLASK.git
-
 # Install the Python of the selected version(3.6.1)
+
+#git clone https://github.com/Khrystynapopiv/PP_LABS_FLASK.git
 
 #Create and activate a virtual Python environment with an interpreter
 
