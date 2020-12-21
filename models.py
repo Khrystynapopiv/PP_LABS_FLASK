@@ -8,8 +8,9 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm import backref
 
 
-engine = create_engine
-engine = create_engine('postgresql+psycopg2://victoriapp:victoriapp@localhost/dbpp')
+# engine = create_engine
+# engine = create_engine('postgresql+psycopg2://victoriapp:victoriapp@localhost/dbpp')
+engine = create_engine("postgresql+psycopg2://postgres:1q2w3e4r5t@localhost:5432/postgres")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -25,9 +26,9 @@ order_products = Table("order_products",
                        Column("product_id", Integer(), ForeignKey("products.product_id")))
 
 class product_status(enum.Enum):
-    AVAILABLE ="available"
-    PENDING = "pending"
-    SOLD = "sold"
+    available = "available"
+    pending = "pending"
+    sold = "sold"
 
 class Product(Base):
     __tablename__ = "products"
@@ -38,9 +39,9 @@ class Product(Base):
     status = Column(Enum(product_status))
 
 class order_status(enum.Enum):
-    PLACED = 'placed'
-    APPROVED = 'approved'
-    DELIVERED = 'delivered'
+    placed = 'placed'
+    approved = 'approved'
+    delivered = 'delivered'
 
 class Order(Base):
     __tablename__ = "orders"
@@ -61,3 +62,6 @@ class User(Base):
     email = Column(String)
     orders = relationship(Order, secondary=users_orders, lazy="subquery",
                             backref=backref("Order", lazy=True))
+
+
+Base.metadata.create_all(engine)
