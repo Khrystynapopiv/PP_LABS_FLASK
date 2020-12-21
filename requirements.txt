@@ -4,3 +4,13 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
 Werkzeug==1.0.1
+
+SQLAlchemy~=1.3.20
+alembic~=1.4.3
+marshmallow~=3.9.1
+
+# psql -h localhost -d postgres -U postgres -p 5432 -a -q -f create_tables.sql
+# {"username" : "Max3", "first_name" : "Maksym", "last_name" : "S", "password" : "qwerty", "email" : "qwerty@gmail", "uid" : 3}
+# {"order_id" : 13, "status" : "placed", "products" : [2, 4], "uid" : 3}
+# {"product_id" : 9, "name" : "adapter", "product_number" : 60, "status" : "available"}
+# {"first_name" : "Maxx", "last_name" : "Syrv", "email" : "asdfggh@gmail.com", "password" : "123454321"}
