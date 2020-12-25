@@ -1,11 +1,11 @@
-CREATE TABLE users (
-  uid SERIAL NOT NULL,
+CREATE TABLE users(
+  id SERIAL NOT NULL,
   username VARCHAR,
   first_name VARCHAR,
   last_name VARCHAR,
   password VARCHAR,
   email VARCHAR,
-  PRIMARY KEY (uid)
+  PRIMARY KEY (id)
 );
 
 CREATE TYPE product_status AS ENUM ('available', 'pending', 'sold');
@@ -27,9 +27,9 @@ CREATE TABLE orders(
 );
 
 CREATE TABLE users_orders(
-  uid INTEGER,
+  id INTEGER,
   order_id INTEGER,
-  FOREIGN KEY (uid) REFERENCES users(uid),
+  FOREIGN KEY (id) REFERENCES users(id),
   FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 

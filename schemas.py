@@ -1,19 +1,8 @@
 from marshmallow import Schema, fields, validate, post_load
-from models import *
+from PP_LABS_FLASK.models import *
 
 
-class UserSchema(Schema):
-    uid = fields.Int()
-    username = fields.Str()
-    first_name = fields.Str()
-    last_name = fields.Str()
-    email = fields.Email()
-    password = fields.Str()
-    orders = fields.List(fields.Nested(OrderSchema(only=('order_id', ))))
 
-    @post_load
-    def create_user(self, data, **kwargs):
-        return User(**data)
 
 
 class ProductSchema(Schema):
@@ -38,7 +27,7 @@ class OrderSchema(Schema):
 
 
 class UserSchema(Schema):
-    uid = fields.Int()
+    id = fields.Int()
     username = fields.Str()
     first_name = fields.Str()
     last_name = fields.Str()
