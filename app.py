@@ -122,10 +122,11 @@ def get_user(username):
 def update_user(uid):
 
     user = session.query(User).filter_by(id=uid).first()
-    if user.id != current_identity.id:
-        return 'It is not your acount', 403
     if user is None:
         return jsonify({'message': "User is not found", "code": 404}), 404
+    if user.id != current_identity.id:
+        return 'It is not your acount', 403
+
     data = request.get_json()
 
     user.first_name = data['first_name'] if 'first_name' in data else user.first_name
@@ -144,10 +145,10 @@ def update_user(uid):
 @jwt_required()
 def delete_user(uid):
     user = session.query(User).filter_by(id=uid).first()
-    if user.id != current_identity.id:
-        return 'It is not your acount', 403
     if user is None:
         return jsonify({'message': "User is not found", "code": 404}), 404
+    if user.id != current_identity.id:
+        return 'It is not your acount', 403
     session.delete(user)
     session.commit()
     return jsonify({'message': 'User is deleted!'})
@@ -221,6 +222,25 @@ def get_product(product_id):
 
 if __name__ == '__main__':
     app.run()
-# curl -X POST http://127.0.0.1:5000/user -H "Content-Type: application/json" --data "{\"username\" : \"admin\", \"first_name\" : \"Maksym\", \"last_name\" : \"S\", \"password\" : \"qwerty\", \"email\" : \"qwerty@gmail\", \"id\" : \"10\"}"
-#  curl -X POST http://127.0.0.1:5000/users/login -H "Content-Type:application/json" --data "{\"username\" : \"Max3\",  \"password\" : \"qwerty\"}
-# curl -X POST http://127.0.0.1:5000/product -H "Content-Type: application/json" -H "Authorization: JWT" --data "{\"product_id\" : \"46\", \"name\" : \"adapter\", \"product_number\" : \"60\", \"status\" : \"available\"}"
+
+# DB
+# psql -h localhost -d postgres -U postgres -p 5433 -a -q -f create_tables.sql
+
+# USER
+# curl -X POST http://127.0.0.1:5000/user -H "Content-Type: application/json" --data "{\"username\" : \"kh\", \"first_name\" : \"Khrystyna\", \"last_name\" : \"P\", \"password\" : \"qwerty\", \"email\" : \"kh@gmail\", \"id\" : \"4\"}"
+# curl -X PUT http://127.0.0.1:5000/user/4 -H "Content-Type: application/json" -H "Authorization: JWT " --data "{\"last_name\" : \"Popiv\"}"
+# curl -X DELETE http://127.0.0.1:5000/user/4 -H "Content-Type: application/json" -H "Authorization: JWT
+# curl -X GET http://127.0.0.1:5000/user/4
+
+
+# LOG
+#  curl -X POST http://127.0.0.1:5000/users/login -H "Content-Type:application/json" --data "{\"username\" : \"kh\",  \"password\" : \"qwerty\"}
+
+# PRODUCT
+# curl -X POST http://127.0.0.1:5000/product -H "Content-Type: application/json" -H "Authorization: JWT" --data "{\"product_id\" : \"2\", \"name\" : \"adapter\", \"product_number\" : \"60\", \"status\" : \"available\"}"
+# curl -X DELETE http://127.0.0.1:5000/product/2 -H "Content-Type: application/json" -H "Authorization: JWT"
+# curl -X PUT http://127.0.0.1:5000/product/2 -H "Content-Type: application/json" -H "Authorization: JWT" --data "{\"product_number\" : \"46\"}"
+
+# ORDER
+# curl -X POST http://127.0.0.1:5000/store/order/2 -H "Content-Type: application/json" -H "Authorization: JWT"  --data "{\"order_id\" : \"1\", \"status\" : \"placed\", \"products\" : [\"1\"]}"
+# curl -X GET http://127.0.0.1:5000/store/order/1 -H "Content-Type: application/json" -H "Authorization: JWT"
