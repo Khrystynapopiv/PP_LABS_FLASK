@@ -10,14 +10,14 @@ from sqlalchemy.orm import backref
 
 # engine = create_engine
 # engine = create_engine('postgresql+psycopg2://victoriapp:victoriapp@localhost/dbpp')
-engine = create_engine("postgresql+psycopg2://postgres:1q2w3e4r5t@localhost:5432/postgres")
+engine = create_engine("postgresql://postgres:123456@localhost:5433/postgres")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
 
 users_orders = Table("users_orders",
                        Base.metadata,
-                       Column("uid", Integer(), ForeignKey("users.uid")),
+                       Column("id", Integer(), ForeignKey("users.id")),
                        Column("order_id", Integer(), ForeignKey("orders.order_id")))
 
 order_products = Table("order_products",
@@ -54,7 +54,7 @@ class Order(Base):
 class User(Base):
     __tablename__ = "users"
 
-    uid = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key = True)
     username = Column(String)
     first_name = Column(String)
     last_name = Column(String)
@@ -64,4 +64,4 @@ class User(Base):
                             backref=backref("Order", lazy=True))
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

@@ -1,4 +1,4 @@
-from models import Session, User, Product, Order, product_status, order_status
+from PP_LABS_FLASK.models import Session, User, Product, Order, product_status, order_status
 
 session = Session()
 
@@ -20,11 +20,11 @@ session.add(order1)
 session.add(order2)
 session.add(order3)
 
-user1 = User(uid = 1, username = 'Victoria1', first_name = 'Victoria', last_name = 'H',
+user1 = User(id = 1, username = 'Victoria1', first_name = 'Victoria', last_name = 'H',
         password = 'qwerty', email = 'qwerty@gmail', orders = [order1, order2])
-user2 = User(uid = 2, username = 'Victoria2', first_name = 'Victoria', last_name = 'H',
+user2 = User(id = 2, username = 'Victoria2', first_name = 'Victoria', last_name = 'H',
         password = 'asdfg', email = 'asdfg@gmail', orders = [order1, order3])
-user3 = User(uid = 3, username = 'Victoria3', first_name = 'Victoria', last_name = 'H',
+user3 = User(id = 3, username = 'Victoria3', first_name = 'Victoria', last_name = 'H',
          password = 'zxcvb', email = 'zxcvb@gmail', orders = [order2, order3])
 
 
