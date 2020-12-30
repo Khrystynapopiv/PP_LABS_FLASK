@@ -1,16 +1,16 @@
 import enum
-
 from sqlalchemy import create_engine, Integer, Column, String, ForeignKey, Enum
 from sqlalchemy import Table, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.mysql import TINYTEXT
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm import backref
+from sqlalchemy.dialects.postgresql import ENUM
 
 
 # engine = create_engine
-# engine = create_engine('postgresql+psycopg2://victoriapp:victoriapp@localhost/dbpp')
-engine = create_engine("postgresql://postgres:123456@localhost:5433/postgres")
+engine = create_engine('postgresql+psycopg2://victoriapp:victoriapp@localhost/dbpp')
+#engine = create_engine("postgresql://postgres:123456@localhost:5433/postgres")
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -25,7 +25,8 @@ order_products = Table("order_products",
                        Column("order_id", Integer(), ForeignKey("orders.order_id")),
                        Column("product_id", Integer(), ForeignKey("products.product_id")))
 
-class product_status(enum.Enum):
+
+class ProductStatus(enum.Enum):
     available = "available"
     pending = "pending"
     sold = "sold"
@@ -36,12 +37,12 @@ class Product(Base):
     product_id = Column(Integer, primary_key = True)
     name = Column(String)
     product_number = Column(Integer)
-    status = Column(Enum(product_status))
+    status = Column(Enum(ProductStatus, create_type=False))
 
-class order_status(enum.Enum):
-    placed = 'placed'
-    approved = 'approved'
-    delivered = 'delivered'
+class OrderStatus(enum.Enum):
+    placed = "placed"
+    approved = "approved"
+    delivered = "delivered"
 
 class Order(Base):
     __tablename__ = "orders"
@@ -49,7 +50,7 @@ class Order(Base):
     order_id = Column(Integer, primary_key = True)
     products = relationship(Product, secondary=order_products, lazy="subquery",
                             backref=backref("Product", lazy=True))
-    status = Column(Enum(order_status))
+    status = Column(Enum(OrderStatus))
 
 class User(Base):
     __tablename__ = "users"
