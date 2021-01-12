@@ -2,9 +2,6 @@ from marshmallow import Schema, fields, validate, post_load
 from PP_LABS_FLASK.models import *
 
 
-
-
-
 class ProductSchema(Schema):
     product_id = fields.Int()
     name = fields.Str()
@@ -18,7 +15,7 @@ class ProductSchema(Schema):
 
 class OrderSchema(Schema):
     order_id = fields.Int()
-    status = fields.Str(validate=validate.OneOf(['placed', 'approved', 'delivered']))
+    status = fields.Str(validate=validate.OneOf(["placed", "approved", "delivered"]))
     products = fields.List(fields.Nested(ProductSchema(only=('product_id', ))))
 
     @post_load

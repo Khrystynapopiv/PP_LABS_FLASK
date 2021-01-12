@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, abort
-
-from PP_LABS_FLASK.schemas import *
-from PP_LABS_FLASK.models import *
+from .schemas import *
+from .models import *
 from marshmallow import ValidationError
 from flask_bcrypt import Bcrypt
 import os, sys
@@ -16,6 +15,8 @@ session = Session()
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = '06Oh72gc65dF4WIZzi8oOSIob9LRFegYbgYXs2GdBdOIylIEMS'
 app.config['JWT_AUTH_URL_RULE'] = '/users/login'
+
+
 
 def authenticate(username, password):
     user = session.query(User).filter(User.username == username).first()
@@ -39,17 +40,16 @@ JWT = JWT(app, authenticate, identity)
 @jwt_required()
 def create_product():
     admin = UserSchema().dump(current_identity)
-    if admin['username'] != 'admin' : return("This method not allowed")
+    if admin['username'] != 'admin' : return("This method not allowed"), 401
     else:
-        if len(session.query(Product).all()) > 7:
-            return jsonify({'message': 'Too much products were add!'})
+        if len(session.query(Product).all()) >= 7:
+            return jsonify({'message': 'Too much products were add!'}), 400
         data = request.get_json()
         new_product = Product(product_id=data["product_id"], name=data["name"], product_number=data["product_number"],
                               status=data["status"])
         session.add(new_product)
         session.commit()
-        return jsonify({'message': 'New product added!'})
-
+        return jsonify({'message': 'New product added!'}), 200
 
 
 @app.route('/product/<product_id>', methods=['PUT'])
@@ -57,11 +57,11 @@ def create_product():
 def update_product(product_id):
     admin = UserSchema().dump(current_identity)
     if admin['username'] != 'admin':
-        return ("This method not allowed")
+        return ("This method not allowed"), 401
     else:
         product = session.query(Product).filter_by(product_id=product_id).first()
         if product is None:
-            raise ValidationError(message="Invalid ID supplied")
+            return"Invalid ID supplied", 404
         data = request.get_json()
 
         product.name = data['name'] if 'name' in data else product.name
@@ -71,7 +71,7 @@ def update_product(product_id):
         session.commit()
         product_schema = ProductSchema()
         result = product_schema.dump(product)
-        return result
+        return result, 200
 
 
 @app.route('/product/<product_id>', methods=['DELETE'])
@@ -79,14 +79,14 @@ def update_product(product_id):
 def delete_product(product_id):
     admin = UserSchema().dump(current_identity)
     if admin['username'] != 'admin':
-        return ("This method not allowed")
+        return ("This method not allowed"), 401
     else:
         product = session.query(Product).filter_by(product_id=product_id).first()
         if product is None:
-            return jsonify({'message': "Invalid ID supplied"})
+            return jsonify({'message': "Invalid ID supplied"}), 404
         session.delete(product)
         session.commit()
-        return jsonify({'message': 'Product is deleted!'})
+        return jsonify({'message': 'Product is deleted!'}), 200
 
 
 @app.route('/user', methods=['POST'])
@@ -101,10 +101,10 @@ def create_user():
                     password=bcrypt.generate_password_hash(data['password']).decode('utf-8'))
     schema = UserSchema()
     if not session.query(User).filter(User.username == data['username']).first() is None:
-        return "This username already exists"
+        return "This username already exists", 400
     session.add(new_user)
     session.commit()
-    return jsonify({'message': 'New user created!'})
+    return 'New user created', 200
 
 
 @app.route('/user/<username>', methods=['GET'])
@@ -138,7 +138,7 @@ def update_user(uid):
     session.commit()
     user_schema = UserSchema()
     result = user_schema.dump(user)
-    return result
+    return result, 200
 
 
 @app.route('/user/<uid>', methods=['DELETE'])
@@ -148,10 +148,10 @@ def delete_user(uid):
     if user is None:
         return jsonify({'message': "User is not found", "code": 404}), 404
     if user.id != current_identity.id:
-        return 'It is not your acount', 403
+        return 'It is not your acount', 401
     session.delete(user)
     session.commit()
-    return jsonify({'message': 'User is deleted!'})
+    return jsonify({'message': 'User is deleted!'}), 200
 
 
 @app.route('/store/order/<id>', methods=['POST'])
@@ -172,7 +172,7 @@ def create_order(id):
         product = session.query(Product).filter_by(product_id=i).first()
 
         if product.product_number <= 0:
-            return jsonify({'message': "Product with id {} isn`t available!".format(i)})
+            return jsonify({'message': "Product with id {} isn`t available!".format(i)}), 400
         products.append(product)
         product.product_number -= 1
         new_order.products.append(product)
@@ -180,34 +180,34 @@ def create_order(id):
     user.orders.append(new_order)
     session.add(new_order)
     session.commit()
-    return jsonify({'message': 'New order created!'})
+    return jsonify({'message': 'New order created!'}), 200
 
 
 @app.route('/store/order/<order_id>', methods=['GET'])
 @jwt_required()
 def get_order(order_id):
-    order2 = session.query(users_orders).filter_by(order_id=order_id).first()
-    if order2.id != current_identity.id: return 'It is not your order', 403
     order = session.query(Order).filter_by(order_id=order_id).first()
-
     if order is None:
         return jsonify({'message': "Order is not found", "code": 404}), 404
+    
+    order2 = session.query(users_orders).filter_by(order_id=order_id).first()
+    if order2.id != current_identity.id: return 'It is not your order', 403
     order_schema = OrderSchema()
     result = order_schema.dump(order)
-    return result
+    return result, 200
 
 
 @app.route('/store/order/<order_id>', methods=['DELETE'])
 @jwt_required()
 def delete_order(order_id):
-    order2 = session.query(users_orders).filter_by(order_id=order_id).first()
-    if order2.id != current_identity.id :return 'It is not your order', 403
     order = session.query(Order).filter_by(order_id=order_id).first()
     if order is None:
         return jsonify({'message': "Order is not found", "code": 404}), 404
+    order2 = session.query(users_orders).filter_by(order_id=order_id).first()
+    if order2.id != current_identity.id :return 'It is not your order', 403
     session.delete(order)
     session.commit()
-    return jsonify({'message': 'Order is deleted!'})
+    return jsonify({'message': 'Order is deleted!'}), 200
 
 
 @app.route('/store/inventory/<product_id>', methods=['GET'])
@@ -218,7 +218,7 @@ def get_product(product_id):
         return jsonify({'message': "product is not found", "code": 404}), 404
     product_schema = ProductSchema()
     result = product_schema.dump(product)
-    return result
+    return result, 200
 
 if __name__ == '__main__':
     app.run()
